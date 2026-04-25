@@ -58,6 +58,7 @@ Side Piece is built on **Local-First** principles. No telemetry, no bloat, and n
 ---
 
 <div align="center">
+  <p>Read the story: <a href="https://ghostintheprompt.com/articles/side-piece"><b>Meet Cynthia →</b></a></p>
   <p>Built by <b>MDRN Corp</b> — <a href="https://mdrn.app">mdrn.app</a></p>
   <p><i>"Strictly Professional. Mostly."</i></p>
 </div>
