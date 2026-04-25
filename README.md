@@ -17,7 +17,7 @@
 </div>
 
 ### Pull Up a Chair, Executive.
-You look like a man with too many "side projects" and not enough hands to snatch them all. Between the ringing phones and the incessant pings, it’s a wonder you have time to pour your own scotch. That’s where I come in. I’ve gone ahead and built you a **Side Piece**—a little something specialized, strictly for your eyes. It’s a dedicated, 1960s interface where I handle the "noise" while you focus on the Big Picture.
+You look like a man with too many "side projects" and not enough hands to snatch them all. Between the ringing phones and the incessant pings, it’s a wonder you have time to pour your own Negroni. That’s where I come in. I’ve gone ahead and built you a **Side Piece**—a little something specialized, strictly for your eyes. It’s a dedicated, 1960s interface where I handle life's nonsense while you focus on the Big Stuff.
 
 ### Feature Suite
 | Feature | Description |
