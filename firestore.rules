@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(data) {
+      return isSignedIn() && data.ownerId == request.auth.uid;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    match /conversations/{conversationId} {
+      function isValidConversation(data) {
+        return data.keys().hasAll(['contactName', 'phoneNumber', 'lastMessage', 'timestamp', 'category', 'ownerId']) &&
+               data.contactName is string && data.contactName.size() <= 100 &&
+               data.phoneNumber is string && data.phoneNumber.size() <= 32 &&
+               data.lastMessage is string && data.lastMessage.size() <= 2000 &&
+               data.category in ['business', 'personal', 'medical', 'other'] &&
+               data.ownerId == request.auth.uid;
+      }
+
+      allow read: if isOwner(resource.data);
+      allow create: if isSignedIn() && isValidConversation(request.resource.data);
+      allow update: if isOwner(resource.data) && isValidConversation(request.resource.data) &&
+                      request.resource.data.ownerId == resource.data.ownerId;
+      allow delete: if isOwner(resource.data);
+
+      match /messages/{messageId} {
+        function isValidMessage(data) {
+          return data.keys().hasAll(['sender', 'content', 'timestamp', 'type', 'ownerId']) &&
+                 data.sender is string && data.sender.size() <= 100 &&
+                 data.content is string && data.content.size() <= 5000 &&
+                 data.type in ['incoming', 'outgoing', 'assistant'] &&
+                 data.ownerId == request.auth.uid;
+        }
+
+        allow read: if isOwner(resource.data);
+        allow create: if isSignedIn() && isValidMessage(request.resource.data);
+        allow update: if isOwner(resource.data) && isValidMessage(request.resource.data) &&
+                        request.resource.data.ownerId == resource.data.ownerId;
+        allow delete: if isOwner(resource.data);
+      }
+    }
+  }
+}

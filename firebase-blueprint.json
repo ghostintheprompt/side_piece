@@ -1,0 +1,43 @@
+{
+  "entities": {
+    "Conversation": {
+      "title": "Conversation",
+      "description": "A metadata record for a chat thread",
+      "type": "object",
+      "properties": {
+        "contactName": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "lastMessage": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "category": { "type": "string", "enum": ["business", "personal", "medical", "other"] },
+        "unreadCount": { "type": "integer" },
+        "ownerId": { "type": "string" }
+      },
+      "required": ["contactName", "phoneNumber", "lastMessage", "timestamp", "category", "ownerId"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "An individual message within a conversation",
+      "type": "object",
+      "properties": {
+        "sender": { "type": "string" },
+        "content": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "type": { "type": "string", "enum": ["incoming", "outgoing", "assistant"] },
+        "category": { "type": "string" },
+        "ownerId": { "type": "string" }
+      },
+      "required": ["sender", "content", "timestamp", "type", "ownerId"]
+    }
+  },
+  "firestore": {
+    "/conversations/{conversationId}": {
+      "schema": "Conversation",
+      "description": "Collection of active communication threads"
+    },
+    "/conversations/{conversationId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Messages belonging to a specific thread"
+    }
+  }
+}

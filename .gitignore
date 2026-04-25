@@ -1,0 +1,34 @@
+# Build output
+dist/
+build/
+bin/
+
+# Dependencies
+node_modules/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Environment and secrets
+.env*
+!.env.example
+firebase-applet-config.json
+
+# IDEs
+.vscode/
+.idea/
+
+# Release artifacts
+*.dmg
+*.zip
+*.tar.gz
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Mac specific
+DerivedData/

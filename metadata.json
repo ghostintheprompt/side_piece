@@ -1,0 +1,9 @@
+{
+  "name": "Side Piece",
+  "description": "Cynthia's Private Desktop: A mid-century executive suite for handling your communications with style, wit, and total secretarial devotion.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": []
+}
