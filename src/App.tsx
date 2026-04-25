@@ -139,7 +139,7 @@ export default function App() {
         
         await addDoc(collection(db, `conversations/${selectedConvId}/messages`), {
           sender: 'Cynthia',
-          content: assistantText || "The line went fuzzy for a moment, Honey. Why don't you try that again after I've had a chance to check my files?",
+          content: assistantText || "The signal is fading into static, Sugar. Let's try that again after I've had a moment to... straighten things out.",
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           type: 'assistant',
           ownerId: user.uid
@@ -147,7 +147,7 @@ export default function App() {
         setIsAssistantTyping(false);
       }
     } catch (error) {
-      console.error("Transmission failed:", error);
+      console.error("The line went dead:", error);
     }
   };
 
@@ -211,7 +211,7 @@ export default function App() {
         </div>
 
         <div className="absolute bottom-10 flex flex-col items-center space-y-2">
-          <span className="text-[10px] font-mono text-[#A68A56]/40 uppercase tracking-[0.2em]">1960 Protocol Edition</span>
+          <span className="text-[10px] font-mono text-[#A68A56]/40 uppercase tracking-[0.2em]">1960 Private Edition</span>
           <div className="flex space-x-4 opacity-20">
             <div className="w-1.5 h-1.5 rounded-full bg-[#A68A56]" />
             <div className="w-1.5 h-1.5 rounded-full bg-[#A68A56]" />
