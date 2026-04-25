@@ -12,6 +12,7 @@ import {
   Plus
 } from 'lucide-react';
 import { Conversation } from '../types';
+import { Pinup } from './Pinup';
 
 interface SidebarProps {
   conversations: Conversation[];
@@ -111,6 +112,11 @@ export function Sidebar({ conversations, selectedId, onSelect, onNewFrequency, f
             </p>
           </motion.div>
         ))}
+      </div>
+
+      {/* Rotating Pinup */}
+      <div className="px-6 py-8 flex justify-center border-t border-[#142319]/30 bg-black/5">
+        <Pinup size="small" />
       </div>
 
       <div className="p-6 border-t border-[#142319] flex items-center justify-between bg-[#16291D]">

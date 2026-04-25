@@ -10,6 +10,7 @@ import { Conversation, Message } from './types';
 import { getAssistantResponse } from './services/gemini';
 import { auth, googleProvider, db } from './lib/firebase';
 import { checkForUpdates } from './services/updater';
+import { Pinup } from './components/Pinup';
 import { signInWithPopup, onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { 
   collection, 
@@ -160,42 +161,53 @@ export default function App() {
 
   if (!user) {
     return (
-      <div className="h-screen bg-[#1B3022] flex flex-col items-center justify-center space-y-12 relative overflow-hidden">
+      <div className="h-screen bg-[#1B3022] flex flex-col md:flex-row items-center justify-center relative overflow-hidden px-10">
         <div className="absolute inset-0 opacity-[0.05] grayscale contrast-125 bg-[url('https://www.transparenttextures.com/patterns/pvc-venyl.png')]" />
         <div className="absolute top-0 left-0 w-full h-1 bg-[#A68A56]/30" />
         <div className="absolute bottom-0 left-0 w-full h-1 bg-[#A68A56]/30" />
         
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="relative z-10 flex flex-col items-center space-y-8"
-        >
-          <div className="flex flex-col items-center space-y-2">
-            <Heart size={80} className="text-[#991B1B]" strokeWidth={1} />
-            <div className="h-[1px] w-12 bg-[#A68A56]/40" />
-          </div>
-          
-          <div className="text-center space-y-4">
-            <h1 className="text-6xl font-serif italic text-[#FDFBF7] tracking-tighter leading-none">Cynthia</h1>
-            <p className="text-[#A68A56] font-mono text-[10px] uppercase tracking-[0.4em] opacity-80">
-              Private Desktop & Personal Secretary
-            </p>
-          </div>
-
-          <div className="w-[1px] h-16 bg-gradient-to-b from-[#A68A56]/0 via-[#A68A56]/40 to-[#A68A56]/0" />
-
-          <button 
-            onClick={handleLogin}
-            className="group relative flex items-center space-x-4 bg-transparent border border-[#A68A56]/50 px-10 py-5 rounded-sm hover:border-[#FDFBF7] transition-all duration-500 overflow-hidden"
+        <div className="relative z-10 w-full max-w-6xl flex flex-col md:flex-row items-center gap-20">
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1 }}
+            className="hidden md:block w-1/2 aspect-square max-w-md"
           >
-            <div className="absolute inset-0 bg-[#A68A56] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-            <LogIn size={20} className="relative z-10 text-[#FDFBF7] group-hover:text-[#1B3022] transition-colors" />
-            <span className="relative z-10 text-[#FDFBF7] group-hover:text-[#1B3022] font-serif italic text-lg transition-colors">
-              Knock on Cynthia's Door
-            </span>
-          </button>
-        </motion.div>
+            <Pinup size="large" />
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="flex flex-col items-center md:items-start space-y-8 flex-1"
+          >
+            <div className="flex flex-col items-center md:items-start space-y-2">
+              <Heart size={80} className="text-[#991B1B]" strokeWidth={1} />
+              <div className="h-[1px] w-12 bg-[#A68A56]/40" />
+            </div>
+            
+            <div className="text-center md:text-left space-y-4">
+              <h1 className="text-8xl font-serif italic text-[#FDFBF7] tracking-tighter leading-none">Cynthia</h1>
+              <p className="text-[#A68A56] font-mono text-[12px] uppercase tracking-[0.4em] opacity-80">
+                Private Desktop & Personal Secretary
+              </p>
+            </div>
+
+            <div className="w-[1px] md:w-32 h-16 md:h-[1px] bg-gradient-to-b md:bg-gradient-to-r from-[#A68A56]/0 via-[#A68A56]/40 to-[#A68A56]/0" />
+
+            <button 
+              onClick={handleLogin}
+              className="group relative flex items-center space-x-4 bg-transparent border border-[#A68A56]/50 px-10 py-5 rounded-sm hover:border-[#FDFBF7] transition-all duration-500 overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-[#A68A56] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+              <LogIn size={20} className="relative z-10 text-[#FDFBF7] group-hover:text-[#1B3022] transition-colors" />
+              <span className="relative z-10 text-[#FDFBF7] group-hover:text-[#1B3022] font-serif italic text-lg transition-colors">
+                Knock on Cynthia's Door
+              </span>
+            </button>
+          </motion.div>
+        </div>
 
         <div className="absolute bottom-10 flex flex-col items-center space-y-2">
           <span className="text-[10px] font-mono text-[#A68A56]/40 uppercase tracking-[0.2em]">1962 Protocol Edition</span>

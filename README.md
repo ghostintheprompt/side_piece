@@ -12,8 +12,17 @@
 
 ---
 
+<div align="center" style="margin: 40px 0;">
+  <img src="side_piece_1.png" width="550" style="border-radius: 4px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); transform: rotate(-2deg); border: 12px solid #FDFBF7;" alt="Cynthia - The Executive's Pinup" />
+</div>
+
 ### Pull Up a Chair, Boss.
 You look like a man with too many "frequencies" and not enough hands to snatch them. Between the ringing phones and the incessant pings, it’s a wonder you have time to pour your own Negroni That’s where I come in. I’ve gone ahead and built you a **Side Piece**—a little something specialized, strictly for your eyes. It’s a dedicated, mid-century interface where I handle the "noise" while you focus on being the Big Picture guy.
+
+<div align="center" style="display: flex; justify-content: center; gap: 30px; margin: 40px 0; flex-wrap: wrap;">
+  <img src="side_piece_2.png" width="300" style="border-radius: 2px; box-shadow: 0 15px 25px rgba(0,0,0,0.3); transform: rotate(3deg); border: 10px solid #FDFBF7;" alt="Cynthia Detail 1" />
+  <img src="side_piece_3.png" width="300" style="border-radius: 2px; box-shadow: 0 15px 25px rgba(0,0,0,0.3); transform: rotate(-4deg); border: 10px solid #FDFBF7;" alt="Cynthia Detail 2" />
+</div>
 
 ### Feature Suite
 | Feature | Description |
@@ -32,6 +41,10 @@ For the full executive feel, download the latest edition and pin me to your dock
 
 **Build from Source**
 If you prefer to handle the logistics yourself, see [BUILD.md](./BUILD.md).
+
+<div align="center" style="margin: 40px 0;">
+  <img src="side_piece_4.png" width="550" style="border-radius: 4px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); transform: rotate(1deg); border: 12px solid #FDFBF7;" alt="Cynthia Feature Overview" />
+</div>
 
 ### Usage Steps
 1. **Knock on the Door:** Sign in with your Google credentials.
