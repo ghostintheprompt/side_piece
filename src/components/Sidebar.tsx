@@ -26,10 +26,10 @@ interface SidebarProps {
 
 export function Sidebar({ conversations, selectedId, onSelect, onNewFrequency, filter, setFilter, onLogout }: SidebarProps) {
   const categories = [
-    { id: 'all', icon: MessageSquare, label: 'All' },
-    { id: 'business', icon: Briefcase, label: 'Business' },
-    { id: 'personal', icon: User, label: 'Personal' },
-    { id: 'medical', icon: Stethoscope, label: 'Medical' },
+    { id: 'all', icon: MessageSquare, label: 'The Suite' },
+    { id: 'business', icon: Briefcase, label: 'Ambition' },
+    { id: 'personal', icon: User, label: 'Complications' },
+    { id: 'medical', icon: Stethoscope, label: 'Vigor' },
   ];
 
   const filteredConversations = conversations.filter(c => 
@@ -75,7 +75,7 @@ export function Sidebar({ conversations, selectedId, onSelect, onNewFrequency, f
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A68A56]/40 group-focus-within:text-[#FDFBF7] transition-colors" />
           <input 
             type="text" 
-            placeholder="Search frequencies..." 
+            placeholder="Scan the frequencies..." 
             className="w-full bg-[#142319] border-none rounded-md py-2 pl-9 pr-4 text-xs focus:ring-1 focus:ring-[#A68A56] text-[#FDFBF7] placeholder-[#A68A56]/30"
           />
         </div>
@@ -122,13 +122,13 @@ export function Sidebar({ conversations, selectedId, onSelect, onNewFrequency, f
       <div className="p-6 border-t border-[#142319] flex items-center justify-between bg-[#16291D]">
         <div className="flex items-center space-x-2 text-[#A68A56] hover:text-[#FDFBF7] cursor-help transition-colors group">
           <Heart size={16} className="group-hover:animate-bounce text-[#991B1B]" />
-          <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-60">Status: Waiting for You</span>
+          <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-60">Status: Lighting your Lucky</span>
         </div>
         <div className="flex items-center space-x-3">
           <button 
             id="logout-btn" 
             onClick={onLogout}
-            title="Terminate Session"
+            title="End the Arrangement"
             className="p-2 rounded-full hover:bg-white/5 text-[#A68A56] hover:text-[#991B1B] transition-colors"
           >
             <Settings size={14} />
@@ -136,7 +136,7 @@ export function Sidebar({ conversations, selectedId, onSelect, onNewFrequency, f
           <button 
             id="add-contact" 
             onClick={onNewFrequency}
-            title="New Frequency Entry"
+            title="Establish Connection"
             className="p-2.5 rounded-full bg-[#A68A56] hover:bg-[#FDFBF7] text-[#1B3022] transition-all shadow-xl active:scale-95"
           >
             <Plus size={16} strokeWidth={3} />
