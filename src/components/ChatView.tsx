@@ -29,7 +29,7 @@ export function ChatView({ conversation, messages, onSendMessage }: ChatProps) {
     return (
       <div className="flex-1 h-full flex flex-col items-center justify-center text-[#404040]">
         <Heart size={48} className="mb-4 text-[#991B1B] opacity-20 animate-pulse" />
-        <p className="text-sm font-serif italic tracking-wide opacity-40">Choose a line to open, Boss.</p>
+        <p className="text-sm font-serif italic tracking-wide opacity-40">What's the word, Executive? I'm all yours. Choose a line.</p>
       </div>
     );
   }
@@ -78,7 +78,7 @@ export function ChatView({ conversation, messages, onSendMessage }: ChatProps) {
                 <div className="flex items-center space-x-3 mb-2 px-1">
                   {isAssistant && <Heart size={12} className="text-[#991B1B] animate-pulse" />}
                   <span className={`text-[10px] font-mono uppercase tracking-[0.2em] ${isAssistant ? 'text-[#A68A56]' : 'text-[#9CA3AF]'}`}>
-                    {isAssistant ? 'Cynthia' : isOutgoing ? 'Executive Desk' : 'External Signal'}
+                    {isAssistant ? 'Cynthia' : isOutgoing ? 'The Big Chair' : 'External Signal'}
                   </span>
                   <span className="text-[10px] text-[#E5E7EB]">/</span>
                   <span className="text-[10px] font-mono text-[#9CA3AF]">{msg.timestamp}</span>
@@ -108,7 +108,7 @@ export function ChatView({ conversation, messages, onSendMessage }: ChatProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Any special orders, Boss? Type 'Cynthia' for some attention..."
+            placeholder="What's on your mind, Sugar? I'm listening... and I'm all yours."
             className="w-full bg-white border border-[#E5E7EB] rounded-lg py-5 pl-8 pr-16 text-sm font-sans focus:outline-none focus:ring-1 focus:ring-[#A68A56] focus:border-[#A68A56] transition-all shadow-sm placeholder-[#9CA3AF]"
           />
           <button
@@ -122,9 +122,9 @@ export function ChatView({ conversation, messages, onSendMessage }: ChatProps) {
           </button>
         </div>
         <p className="mt-4 text-[9px] font-mono text-[#9CA3AF] flex items-center justify-center space-x-2 uppercase tracking-[0.3em]">
-          <span>Cynthia's Private Desktop</span>
+          <span>Cynthia's Private Exchange</span>
           <span className="text-[#A68A56]">•</span>
-          <span>1962 Executive Edition</span>
+          <span>1960 Executive Edition</span>
         </p>
       </div>
     </div>

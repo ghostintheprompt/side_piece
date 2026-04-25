@@ -45,7 +45,7 @@ export default function App() {
       const convData = {
         contactName: newContact.name,
         phoneNumber: newContact.phone,
-        lastMessage: 'Frequency Established.',
+        lastMessage: 'Line established. The air is already heavy.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         category: newContact.category,
         ownerId: user.uid,
@@ -56,7 +56,7 @@ export default function App() {
       
       await addDoc(collection(db, `conversations/${docRef.id}/messages`), {
         sender: 'Cynthia',
-        content: "Oh, hello Boss. I've opened a new line for you. I'll be waiting for your orders... or anything else you might need.",
+        content: "I've opened the line, Executive. This one is tucked away in the private files, waiting for us to... explore the possibilities. What's your pleasure?",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         type: 'assistant',
         ownerId: user.uid
@@ -139,7 +139,7 @@ export default function App() {
         
         await addDoc(collection(db, `conversations/${selectedConvId}/messages`), {
           sender: 'Cynthia',
-          content: assistantText || "I'm sorry Boss, the line went fuzzy. Try again?",
+          content: assistantText || "The line went fuzzy for a moment, Honey. Why don't you try that again after I've had a chance to check my files?",
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           type: 'assistant',
           ownerId: user.uid
@@ -190,7 +190,7 @@ export default function App() {
             <div className="text-center md:text-left space-y-4">
               <h1 className="text-8xl font-serif italic text-[#FDFBF7] tracking-tighter leading-none">Cynthia</h1>
               <p className="text-[#A68A56] font-mono text-[12px] uppercase tracking-[0.4em] opacity-80">
-                Private Desktop & Personal Secretary
+                The Arrangement & The Executive Suite
               </p>
             </div>
 
@@ -203,14 +203,15 @@ export default function App() {
               <div className="absolute inset-0 bg-[#A68A56] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
               <LogIn size={20} className="relative z-10 text-[#FDFBF7] group-hover:text-[#1B3022] transition-colors" />
               <span className="relative z-10 text-[#FDFBF7] group-hover:text-[#1B3022] font-serif italic text-lg transition-colors">
-                Knock on Cynthia's Door
+                Unlock the Suite
               </span>
             </button>
+
           </motion.div>
         </div>
 
         <div className="absolute bottom-10 flex flex-col items-center space-y-2">
-          <span className="text-[10px] font-mono text-[#A68A56]/40 uppercase tracking-[0.2em]">1962 Protocol Edition</span>
+          <span className="text-[10px] font-mono text-[#A68A56]/40 uppercase tracking-[0.2em]">1960 Protocol Edition</span>
           <div className="flex space-x-4 opacity-20">
             <div className="w-1.5 h-1.5 rounded-full bg-[#A68A56]" />
             <div className="w-1.5 h-1.5 rounded-full bg-[#A68A56]" />
@@ -231,7 +232,7 @@ export default function App() {
             exit={{ opacity: 0, y: -20 }}
             className="fixed top-4 right-4 z-[100] bg-[#1B3022] text-[#FDFBF7] px-6 py-3 rounded-sm border border-[#A68A56]/50 shadow-2xl flex items-center space-x-4"
           >
-            <span className="font-serif italic text-sm">A new edition is ready, Boss.</span>
+            <span className="font-serif italic text-sm">A fresh memo just landed, Sugar. Time for an upgrade.</span>
             <a 
               href={updateAvailable.url} 
               target="_blank" 
@@ -271,26 +272,26 @@ export default function App() {
               className="w-full max-w-md bg-[#FDFBF7] border border-[#A68A56]/30 rounded-lg overflow-hidden shadow-2xl"
             >
               <div className="p-8 border-b border-[#A68A56]/10 flex justify-between items-center bg-white/40">
-                <h3 className="text-xl font-serif italic text-[#1B3022]">Private File Entry</h3>
+                <h3 className="text-xl font-serif italic text-[#1B3022]">Top Secret Filing</h3>
                 <button onClick={() => setShowNewModal(false)} className="text-[#A68A56] hover:text-[#991B1B] transition-colors p-1">
                   <Plus size={24} className="rotate-45" />
                 </button>
               </div>
               <form onSubmit={handleCreateFrequency} className="p-8 space-y-6">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-mono text-[#A68A56] uppercase tracking-[0.2em]">Who is it, Boss?</label>
+                  <label className="text-[10px] font-mono text-[#A68A56] uppercase tracking-[0.2em]">Who's Calling, Executive?</label>
                   <input 
                     autoFocus
                     required
                     type="text" 
                     value={newContact.name}
                     onChange={e => setNewContact({...newContact, name: e.target.value})}
-                    placeholder="Identity"
+                    placeholder="The Face"
                     className="w-full bg-white border border-[#E5E7EB] rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#A68A56] focus:border-[#A68A56] transition-all"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-mono text-[#A68A56] uppercase tracking-[0.2em]">Their Number</label>
+                  <label className="text-[10px] font-mono text-[#A68A56] uppercase tracking-[0.2em]">The Frequency</label>
                   <input 
                     required
                     type="text" 
@@ -301,23 +302,23 @@ export default function App() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-mono text-[#A68A56] uppercase tracking-[0.2em]">Classification</label>
+                  <label className="text-[10px] font-mono text-[#A68A56] uppercase tracking-[0.2em]">The Nature of the Signal</label>
                   <select 
                     value={newContact.category}
                     onChange={e => setNewContact({...newContact, category: e.target.value as any})}
                     className="w-full bg-white border border-[#E5E7EB] rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#A68A56] appearance-none cursor-pointer"
                   >
-                    <option value="business">Official / Business</option>
-                    <option value="personal">Social / Personal</option>
-                    <option value="medical">Vital / Medical</option>
-                    <option value="other">Other / Classified</option>
+                    <option value="business">Ambition (Keep it dry)</option>
+                    <option value="personal">Complications (Strictly Private)</option>
+                    <option value="medical">Vigor (Handle with care)</option>
+                    <option value="other">Indiscretions (Eyes Only)</option>
                   </select>
                 </div>
                 <button 
                   type="submit"
                   className="w-full mt-6 bg-[#1B3022] text-[#FDFBF7] py-4 rounded-sm text-[11px] font-mono uppercase tracking-[0.3em] hover:bg-[#142319] transition-all active:scale-[0.98] shadow-lg"
                 >
-                  File it Away, Darling
+                  Tuck it into the Drawer
                 </button>
               </form>
             </motion.div>
