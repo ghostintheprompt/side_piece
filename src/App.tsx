@@ -119,6 +119,7 @@ export default function App() {
     if (!user || !selectedConvId) return;
 
     try {
+      // Add the user message
       await addDoc(collection(db, `conversations/${selectedConvId}/messages`), {
         sender: 'You',
         content,
@@ -131,6 +132,73 @@ export default function App() {
         lastMessage: content,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
+
+      // --- COMMAND HANDLING (THE BLACK BOOK) ---
+      if (content.startsWith('/')) {
+        setIsAssistantTyping(true);
+        let opResult = '';
+        let opType: 'operation' | 'incident' = 'operation';
+        let opTitle = '';
+        let opMetadata = null;
+
+        const token = await user.getIdToken();
+        const headers = { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
+
+        if (content === '/wiretap') {
+          opTitle = 'Scenario s1: The Wiretap';
+          try {
+            const res = await fetch('/api/ops/wiretap', { headers });
+            const data = await res.json();
+            opResult = data.data || 'The wires are silent, Boss.';
+          } catch (e) {
+            opResult = 'Signal interference detected.';
+          }
+        } else if (content === '/ghost') {
+          opTitle = 'Scenario s3: The Ghost in the Room';
+          try {
+            const res = await fetch('/api/ops/ghost-check', { headers });
+            const data = await res.json();
+            opResult = data.data || 'No shadows detected.';
+            if (data.alerts) {
+              opType = 'incident';
+              opMetadata = data.alerts;
+            }
+          } catch (e) {
+            opResult = 'The audit trail went cold.';
+          }
+        } else if (content.startsWith('/shred ')) {
+          opTitle = 'Scenario s2: The Paper Shredder';
+          const filePath = content.replace('/shred ', '').trim();
+          try {
+            const res = await fetch('/api/ops/shred', { 
+              method: 'POST', 
+              headers,
+              body: JSON.stringify({ filePath })
+            });
+            const data = await res.json();
+            opResult = data.status === 'incinerated' ? `The file at ${filePath} has been properly incinerated. No ashes remain.` : (data.error || 'The shredder jammed.');
+          } catch (e) {
+            opResult = 'Shredding operation failed.';
+          }
+        }
+
+        if (opTitle) {
+          await addDoc(collection(db, `conversations/${selectedConvId}/messages`), {
+            sender: 'Cynthia',
+            content: `I've completed the ${opTitle}. Here's the raw transcript for your eyes only, Honey.\n\n${opResult}`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            type: opType,
+            category: 'security',
+            metadata: opMetadata,
+            ownerId: user.uid
+          });
+          setIsAssistantTyping(false);
+          return;
+        }
+      }
 
       if (content.toLowerCase().includes('cynthia') || content.toLowerCase().includes('hey') || content.toLowerCase().includes('summarize')) {
         setIsAssistantTyping(true);
@@ -150,6 +218,7 @@ export default function App() {
       console.error("The line went dead:", error);
     }
   };
+...
 
   if (loading) {
     return (
