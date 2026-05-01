@@ -27,8 +27,18 @@ You look like a man with too many "side projects" and not enough hands to snatch
 | **No Paper Trails** | Everything is filed in your private Firestore suite. Your secrets are safe with me, Darling. |
 | **Update Checker** | I'll let you know the moment a fresh memo on our little arrangement is ready for your review. |
 
-### Installation
+### The Technical Machinery
+While the suite feels like a mid-century dream, the hardware behind the curtain is pure, modern steel. It’s "vintage feel, modern steel"—built to ensure your logistics are handled with surgical precision and total discretion.
 
+| Component | The Hardware | The Purpose |
+| :--- | :--- | :--- |
+| **The Interface** | **React 19 & Vite** | A high-fidelity, responsive exchange that moves as fast as you do. |
+| **The Intelligence** | **Gemini AI (Flash 2.0)** | Cynthia's wit, memory, and analytical prowess, tuned for executive devotion. |
+| **The Filing Cabinet** | **Firebase (Firestore & Auth)** | Your private, secure vault. No prying eyes, just encrypted devotion. |
+| **The Ops Backend** | **Node.js & Express** | The "Black Book" engine. Handles webhooks and system sweeps with cold efficiency. |
+| **The Armor** | **Ghost-Protocol V1.5** | Integrated system auditing, network wiretapping, and secure artifact incineration. |
+
+### Installation
 **Desktop Experience**
 For the full executive feel, download the latest edition and pin me to your dock:
 - [Download latest DMG](https://github.com/ghostintheprompt/side-piece/releases/latest)
@@ -40,7 +50,7 @@ If you prefer to handle the logistics yourself, see [BUILD.md](./BUILD.md).
 ### Usage Steps
 1. **Enter the Suite:** Sign in and access the private exchange.
 2. **Establish Contact:** Add a new signal to your top secret files.
-3. **Issue Orders:** Speak to Cynthia; she's already handled the paperwork.
+3. **Issue Orders:** Speak to Cynthia or use the Black Book commands (`/wiretap`, `/ghost`, `/shred`).
 4. **Maintain Protocol:** Check for fresh memos in the top right corner.
 
 ### Privacy Statement

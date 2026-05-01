@@ -8,8 +8,9 @@ export interface Message {
   sender: string;
   content: string;
   timestamp: string;
-  type: 'incoming' | 'outgoing' | 'assistant';
-  category?: 'business' | 'personal' | 'medical' | 'other';
+  type: 'incoming' | 'outgoing' | 'assistant' | 'operation' | 'incident';
+  category?: 'business' | 'personal' | 'medical' | 'other' | 'security';
+  metadata?: any;
 }
 
 export interface Conversation {
