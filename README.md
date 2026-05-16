@@ -19,13 +19,13 @@
 ### Pull Up a Chair, Executive.
 You look like a man with too many "side projects" and not enough hands to snatch them all. Between the ringing phones and the incessant pings, it’s a wonder you have time to pour your own Negroni. That’s where I come in. I’ve gone ahead and built you a **Side Piece**—a little something specialized, strictly for your eyes. It’s a dedicated, 1960s interface where I handle life's nonsense while you focus on the Big Stuff.
 
-### Portfolio Intent
-Side Piece is a working demonstration, not a pitch deck in a better suit. It shows taste, local-first AI, privacy judgment, telephony workflow design, and end-to-end product execution. Every Cynthia milestone should make one thing obvious: when the obstacle is messy, human, and real, I can still get the door open and the files in order.
+### The Honest Pitch
+This isn’t a pitch deck in a better suit, Darling — it’s the working article. The wires hum under the desk, the lipstick stays on the glass, and every piece of the operation is right where you can put your hands on it. Open the drawer: the local brain on your Mac, the private filing cabinet, the switchboard waiting for the line to ring, and the pinup who keeps the whole executive floor humming. When the world gets noisy — and it always does — I can still have the door closed, the drink poured, and the files squared away before you finish your first cigarette.
 
 ### GitHub First
-For now, Cynthia belongs on GitHub: out in the light, gloves on, cigarette lit, showing the machinery as well as the glamour. The repo is the showroom and the workbench at the same time: code, architecture notes, local model plans, call-answering workflow, and the trail of decisions that prove the thing was actually built.
+For now, Cynthia belongs on GitHub: out in the light, gloves on, cigarette lit, showing the machinery as well as the glamour. The repo is the showroom and the workbench at the same time — code, architecture notes, local model plans, call-answering workflow, and the trail of decisions that prove the thing was actually built, not just promised over cocktails.
 
-The App Store can wait its turn. TestFlight and native builds are useful later, but the portfolio win is here first: a project someone can open, read, run, and understand in five minutes. Cynthia does not need a velvet rope to make an entrance.
+The App Store can wait its turn behind the curtain. TestFlight and signed builds come later, once the lipstick’s set and the heels are buckled. The win is right here: a project you can clone, run, and read in five minutes flat. I don’t need a velvet rope to make an entrance — I let myself in through the front door.
 
 ### Bring Your Own Cynthia
 Cynthia is the house girl: sharp nails, sharper filing system, and a voice you can recognize from across the room. But the machinery is not married to her lipstick. Swap the prompt, the local model, the imagery, and the greeting, and the same system becomes a doctor’s front desk, a law-office gatekeeper, a venue concierge, a sales dispatcher, a studio assistant, or any other character with a job to do and a tone worth remembering.
@@ -45,11 +45,11 @@ While the suite feels like a mid-century dream, the hardware behind the curtain 
 
 | Component | The Hardware | The Purpose |
 | :--- | :--- | :--- |
-| **The Interface** | **React 19 & Vite** | A high-fidelity, responsive exchange that moves as fast as you do. |
-| **The Intelligence** | **Local Ollama Model** | Cynthia's wit, memory, and analytical prowess, kept on your Mac instead of shipped to a hosted API. |
-| **The Filing Cabinet** | **Firebase (Firestore & Auth)** | Your private, secure vault. No prying eyes, just encrypted devotion. |
-| **The Ops Backend** | **Node.js & Express** | The "Black Book" engine. Handles webhooks and system sweeps with cold efficiency. |
-| **The Armor** | **Ghost-Protocol V1.5** | Integrated system auditing, network wiretapping, and secure artifact incineration. |
+| **The Interface** | **React 19 & Vite** | The lacquered front desk. Moves like silk, holds her polish even when you press. |
+| **The Intelligence** | **Local Ollama Model** | My head never leaves the apartment, Darling. No hosted API hears a word we say. |
+| **The Filing Cabinet** | **Firebase (Firestore & Auth)** | Your private vault — lined, locked, and lit only when you turn the key. |
+| **The Ops Backend** | **Node.js & Express** | The Black Book engine. Webhooks answered, sweeps run, lights kept low. |
+| **The Armor** | **Ghost-Protocol V1.5** | Audits, wiretaps, and the silver shredder I keep by the bar cart. |
 
 ### Installation
 **Desktop Experience**
@@ -69,13 +69,13 @@ If you prefer to handle the logistics yourself, see [BUILD.md](./BUILD.md).
 ### Privacy Statement
 Side Piece is built on **Local-First** principles. No telemetry, no bloat, and no prying eyes. Your data lives in your private Firebase instance. Cynthia works for you, and only you.
 
-### Local Model Direction
-Cynthia is now wired for a local Ollama switchboard instead of a hosted model API. The longer-term craft path is documented in [CYNTHIA_LOCAL_MODEL_NOTES.md](./CYNTHIA_LOCAL_MODEL_NOTES.md): build a private voice corpus, train the style locally, and keep the raw material out of the repo where it belongs, behind the locked drawer.
+### A Word On My Brain
+My thoughts run through a local Ollama switchboard now — no hosted API, no operator listening in on the party line, no transcript filed where it shouldn’t be. The longer plan is laid out in [CYNTHIA_LOCAL_MODEL_NOTES.md](./CYNTHIA_LOCAL_MODEL_NOTES.md): gather the voice, school the style on your own machine, and keep the raw recordings in the locked drawer where they belong. Strictly between you and me, Darling.
 
-### Call Answering Direction
-The phone-answering build plan is documented in [CYNTHIA_CALL_ANSWERING_WORKFLOW.md](./CYNTHIA_CALL_ANSWERING_WORKFLOW.md): current service costs, MVP call flow, local speech stack, and the punch list for getting Cynthia on the line without losing her voice in the wires.
+### When The Phone Rings
+The switchboard build is laid out in [CYNTHIA_CALL_ANSWERING_WORKFLOW.md](./CYNTHIA_CALL_ANSWERING_WORKFLOW.md) — service costs, the MVP call flow, the local speech stack, and the punch list for getting me on the line without losing my voice somewhere in the copper.
 
-The no-signup desk is already wired: simulate a call locally, let Cynthia file the memo, and read the drawer.
+The front desk is already wired. Place a call to nowhere, watch me take down the message in the voice you like, and slip the memo into the drawer when you’re ready.
 
 ```bash
 npm run voice:simulate "Hi Michael, this is Carol. Friday moved up and I need a yes before 3. Call me at 212-555-0198."
