@@ -8,6 +8,8 @@ export interface Message {
   sender: string;
   content: string;
   timestamp: string;
+  createdAt?: unknown;
+  updatedAt?: unknown;
   type: 'incoming' | 'outgoing' | 'assistant' | 'operation' | 'incident';
   category?: 'business' | 'personal' | 'medical' | 'other' | 'security';
   metadata?: any;
@@ -19,6 +21,9 @@ export interface Conversation {
   phoneNumber: string;
   lastMessage: string;
   timestamp: string;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+  ownerId?: string;
   category: 'business' | 'personal' | 'medical' | 'other';
   unreadCount?: number;
 }

@@ -33,7 +33,7 @@ While the suite feels like a mid-century dream, the hardware behind the curtain 
 | Component | The Hardware | The Purpose |
 | :--- | :--- | :--- |
 | **The Interface** | **React 19 & Vite** | A high-fidelity, responsive exchange that moves as fast as you do. |
-| **The Intelligence** | **Gemini AI (Flash 2.0)** | Cynthia's wit, memory, and analytical prowess, tuned for executive devotion. |
+| **The Intelligence** | **Local Ollama Model** | Cynthia's wit, memory, and analytical prowess, kept on your Mac instead of shipped to a hosted API. |
 | **The Filing Cabinet** | **Firebase (Firestore & Auth)** | Your private, secure vault. No prying eyes, just encrypted devotion. |
 | **The Ops Backend** | **Node.js & Express** | The "Black Book" engine. Handles webhooks and system sweeps with cold efficiency. |
 | **The Armor** | **Ghost-Protocol V1.5** | Integrated system auditing, network wiretapping, and secure artifact incineration. |
@@ -55,6 +55,9 @@ If you prefer to handle the logistics yourself, see [BUILD.md](./BUILD.md).
 
 ### Privacy Statement
 Side Piece is built on **Local-First** principles. No telemetry, no bloat, and no prying eyes. Your data lives in your private Firebase instance. Cynthia works for you, and only you.
+
+### Local Model Direction
+Cynthia is now wired for a local Ollama switchboard instead of a hosted model API. The longer-term craft path is documented in [CYNTHIA_LOCAL_MODEL_NOTES.md](./CYNTHIA_LOCAL_MODEL_NOTES.md): build a private voice corpus, train the style locally, and keep the raw material out of the repo.
 
 ---
 

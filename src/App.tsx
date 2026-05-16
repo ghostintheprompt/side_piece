@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatView } from './components/ChatView';
 import { Conversation, Message } from './types';
-import { getAssistantResponse } from './services/gemini';
+import { getAssistantResponse } from './services/localAssistant';
 import { auth, googleProvider, db } from './lib/firebase';
 import { checkForUpdates } from './services/updater';
 import { Pinup } from './components/Pinup';
@@ -18,12 +18,50 @@ import {
   where, 
   onSnapshot, 
   addDoc, 
-  orderBy, 
   doc,
+  serverTimestamp,
   updateDoc
 } from 'firebase/firestore';
 import { LogIn, Plus, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+
+const TIME_FORMAT: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' };
+
+function getTimeLabel() {
+  return new Date().toLocaleTimeString([], TIME_FORMAT);
+}
+
+function toMillis(value: unknown) {
+  if (!value) return 0;
+  if (value instanceof Date) return value.getTime();
+
+  if (typeof value === 'object') {
+    const maybeTimestamp = value as { seconds?: number; nanoseconds?: number; toMillis?: () => number };
+    if (typeof maybeTimestamp.toMillis === 'function') return maybeTimestamp.toMillis();
+    if (typeof maybeTimestamp.seconds === 'number') {
+      return maybeTimestamp.seconds * 1000 + Math.floor((maybeTimestamp.nanoseconds ?? 0) / 1000000);
+    }
+  }
+
+  if (typeof value === 'string') {
+    const parsedDate = Date.parse(value);
+    if (!Number.isNaN(parsedDate)) return parsedDate;
+
+    const parsedTime = Date.parse(`1970-01-01 ${value}`);
+    if (!Number.isNaN(parsedTime)) return parsedTime;
+  }
+
+  return 0;
+}
+
+function recordTime(record: { createdAt?: unknown; updatedAt?: unknown; timestamp?: string }) {
+  return toMillis(record.updatedAt ?? record.createdAt) || toMillis(record.timestamp);
+}
+
+function trimTranscript(text: string) {
+  if (text.length <= 12000) return text;
+  return `${text.slice(0, 12000)}\n\n[Transcript trimmed for the private file.]`;
+}
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -35,21 +73,29 @@ export default function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isAssistantTyping, setIsAssistantTyping] = useState(false);
   const [showNewModal, setShowNewModal] = useState(false);
-  const [newContact, setNewContact] = useState({ name: '', phone: '', category: 'business' as const });
+  const [newContact, setNewContact] = useState({ name: '', phone: '', category: 'business' as Conversation['category'] });
+
+  const selectedConversation = useMemo(
+    () => conversations.find(c => c.id === selectedConvId),
+    [conversations, selectedConvId]
+  );
 
   const handleCreateFrequency = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !newContact.name || !newContact.phone) return;
+    if (!user || !newContact.name.trim() || !newContact.phone.trim()) return;
 
     try {
+      const timestamp = getTimeLabel();
       const convData = {
-        contactName: newContact.name,
-        phoneNumber: newContact.phone,
+        contactName: newContact.name.trim(),
+        phoneNumber: newContact.phone.trim(),
         lastMessage: 'Line established. The air is already heavy.',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp,
         category: newContact.category,
         ownerId: user.uid,
-        unreadCount: 0
+        unreadCount: 0,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       };
       
       const docRef = await addDoc(collection(db, 'conversations'), convData);
@@ -57,9 +103,10 @@ export default function App() {
       await addDoc(collection(db, `conversations/${docRef.id}/messages`), {
         sender: 'Cynthia',
         content: "I've opened the line, Executive. This one is tucked away in the private files, waiting for us to... explore the possibilities. What's your pleasure?",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp,
         type: 'assistant',
-        ownerId: user.uid
+        ownerId: user.uid,
+        createdAt: serverTimestamp()
       });
 
       setShowNewModal(false);
@@ -88,11 +135,15 @@ export default function App() {
     if (!user) return;
     const q = query(
       collection(db, 'conversations'), 
-      where('ownerId', '==', user.uid),
-      orderBy('timestamp', 'desc')
+      where('ownerId', '==', user.uid)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setConversations(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Conversation[]);
+      const nextConversations = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }) as Conversation)
+        .sort((a, b) => recordTime(b) - recordTime(a));
+      setConversations(nextConversations);
+    }, (error) => {
+      console.error('Failed to load private frequencies:', error);
     });
     return () => unsubscribe();
   }, [user]);
@@ -103,43 +154,68 @@ export default function App() {
       return;
     }
     const q = query(
-      collection(db, `conversations/${selectedConvId}/messages`),
-      orderBy('timestamp', 'asc')
+      collection(db, `conversations/${selectedConvId}/messages`)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Message[]);
+      const nextMessages = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }) as Message)
+        .sort((a, b) => recordTime(a) - recordTime(b));
+      setMessages(nextMessages);
+    }, (error) => {
+      console.error('Failed to load the conversation:', error);
     });
     return () => unsubscribe();
   }, [user, selectedConvId]);
 
-  const handleLogin = () => signInWithPopup(auth, googleProvider);
+  const handleLogin = () => signInWithPopup(auth, googleProvider).catch(error => {
+    console.error('The suite stayed locked:', error);
+  });
   const handleLogout = () => signOut(auth);
 
   const handleSendMessage = async (content: string) => {
     if (!user || !selectedConvId) return;
 
     try {
+      const trimmed = content.trim();
+      const timestamp = getTimeLabel();
+      const writeCynthiaMessage = async (
+        responseContent: string,
+        type: Message['type'] = 'assistant',
+        category?: Message['category'],
+        metadata: unknown = null
+      ) => addDoc(collection(db, `conversations/${selectedConvId}/messages`), {
+        sender: 'Cynthia',
+        content: responseContent,
+        timestamp: getTimeLabel(),
+        type,
+        ...(category ? { category } : {}),
+        ...(metadata ? { metadata } : {}),
+        ownerId: user.uid,
+        createdAt: serverTimestamp()
+      });
+
       // Add the user message
       await addDoc(collection(db, `conversations/${selectedConvId}/messages`), {
         sender: 'You',
-        content,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        content: trimmed,
+        timestamp,
         type: 'outgoing',
-        ownerId: user.uid
+        ownerId: user.uid,
+        createdAt: serverTimestamp()
       });
 
       await updateDoc(doc(db, 'conversations', selectedConvId), {
-        lastMessage: content,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        lastMessage: trimmed,
+        timestamp,
+        updatedAt: serverTimestamp()
       });
 
-      // --- COMMAND HANDLING (THE BLACK BOOK) ---
-      if (content.startsWith('/')) {
+      if (trimmed.startsWith('/')) {
         setIsAssistantTyping(true);
         let opResult = '';
         let opType: 'operation' | 'incident' = 'operation';
         let opTitle = '';
-        let opMetadata = null;
+        let opMetadata: unknown = null;
 
         const token = await user.getIdToken();
         const headers = { 
@@ -147,21 +223,21 @@ export default function App() {
           'Content-Type': 'application/json'
         };
 
-        if (content === '/wiretap') {
+        if (trimmed === '/wiretap') {
           opTitle = 'Scenario s1: The Wiretap';
           try {
             const res = await fetch('/api/ops/wiretap', { headers });
             const data = await res.json();
-            opResult = data.data || 'The wires are silent, Boss.';
+            opResult = trimTranscript(data.data || 'The wires are silent, Boss.');
           } catch (e) {
             opResult = 'Signal interference detected.';
           }
-        } else if (content === '/ghost') {
+        } else if (trimmed === '/ghost') {
           opTitle = 'Scenario s3: The Ghost in the Room';
           try {
             const res = await fetch('/api/ops/ghost-check', { headers });
             const data = await res.json();
-            opResult = data.data || 'No shadows detected.';
+            opResult = trimTranscript(data.data || 'No shadows detected.');
             if (data.alerts) {
               opType = 'incident';
               opMetadata = data.alerts;
@@ -169,9 +245,9 @@ export default function App() {
           } catch (e) {
             opResult = 'The audit trail went cold.';
           }
-        } else if (content.startsWith('/shred ')) {
+        } else if (trimmed.startsWith('/shred ')) {
           opTitle = 'Scenario s2: The Paper Shredder';
-          const filePath = content.replace('/shred ', '').trim();
+          const filePath = trimmed.replace('/shred ', '').trim();
           try {
             const res = await fetch('/api/ops/shred', { 
               method: 'POST', 
@@ -185,44 +261,44 @@ export default function App() {
           }
         }
 
+        if (!opTitle) {
+          await writeCynthiaMessage('I keep three Black Book keys in the drawer, Boss: /wiretap, /ghost, and /shred followed by the file you want turned to ash.');
+          return;
+        }
+
         if (opTitle) {
-          await addDoc(collection(db, `conversations/${selectedConvId}/messages`), {
-            sender: 'Cynthia',
-            content: `I've completed the ${opTitle}. Here's the raw transcript for your eyes only, Honey.\n\n${opResult}`,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            type: opType,
-            category: 'security',
-            metadata: opMetadata,
-            ownerId: user.uid
-          });
-          setIsAssistantTyping(false);
+          await writeCynthiaMessage(
+            `I've completed the ${opTitle}. Here's the raw transcript for your eyes only.\n\n${opResult}`,
+            opType,
+            'security',
+            opMetadata
+          );
           return;
         }
       }
 
-      if (content.toLowerCase().includes('cynthia') || content.toLowerCase().includes('hey') || content.toLowerCase().includes('summarize')) {
+      const shouldAskCynthia = ['cynthia', 'hey', 'summarize'].some(trigger => trimmed.toLowerCase().includes(trigger));
+
+      if (shouldAskCynthia) {
         setIsAssistantTyping(true);
         const context = messages.slice(-5).map(m => `${m.sender}: ${m.content}`).join('\n');
-        const assistantText = await getAssistantResponse(content, context);
+        const token = await user.getIdToken();
+        const assistantText = await getAssistantResponse(trimmed, context, token);
         
-        await addDoc(collection(db, `conversations/${selectedConvId}/messages`), {
-          sender: 'Cynthia',
-          content: assistantText || "The signal is fading into static, Sugar. Let's try that again after I've had a moment to... straighten things out.",
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          type: 'assistant',
-          ownerId: user.uid
-        });
-        setIsAssistantTyping(false);
+        await writeCynthiaMessage(
+          assistantText || "The signal is fading into static, Sugar. Let's try that again after I've had a moment to... straighten things out."
+        );
       }
     } catch (error) {
       console.error("The line went dead:", error);
+    } finally {
+      setIsAssistantTyping(false);
     }
   };
-...
 
   if (loading) {
     return (
-      <div className="h-screen bg-[#1B3022] flex items-center justify-center">
+      <div className="flex h-dvh min-h-dvh items-center justify-center bg-[#1B3022]">
         <Heart size={32} className="text-[#991B1B] animate-pulse" />
       </div>
     );
@@ -230,12 +306,12 @@ export default function App() {
 
   if (!user) {
     return (
-      <div className="h-screen bg-[#1B3022] flex flex-col md:flex-row items-center justify-center relative overflow-hidden px-10">
+      <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-[#1B3022] px-6 py-10 sm:px-10">
         <div className="absolute inset-0 opacity-[0.05] grayscale contrast-125 bg-[url('https://www.transparenttextures.com/patterns/pvc-venyl.png')]" />
         <div className="absolute top-0 left-0 w-full h-1 bg-[#A68A56]/30" />
         <div className="absolute bottom-0 left-0 w-full h-1 bg-[#A68A56]/30" />
         
-        <div className="relative z-10 w-full max-w-6xl flex flex-col md:flex-row items-center gap-20">
+        <div className="relative z-10 flex w-full max-w-6xl flex-col items-center gap-12 md:flex-row md:gap-20">
           <motion.div 
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -249,16 +325,16 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="flex flex-col items-center md:items-start space-y-8 flex-1"
+            className="flex flex-1 flex-col items-center space-y-8 text-center md:items-start md:text-left"
           >
             <div className="flex flex-col items-center md:items-start space-y-2">
-              <Heart size={80} className="text-[#991B1B]" strokeWidth={1} />
+              <Heart size={72} className="text-[#991B1B] sm:h-20 sm:w-20" strokeWidth={1} />
               <div className="h-[1px] w-12 bg-[#A68A56]/40" />
             </div>
             
-            <div className="text-center md:text-left space-y-4">
-              <h1 className="text-8xl font-serif italic text-[#FDFBF7] tracking-tighter leading-none">Cynthia</h1>
-              <p className="text-[#A68A56] font-mono text-[12px] uppercase tracking-[0.4em] opacity-80">
+            <div className="space-y-4">
+              <h1 className="font-serif text-6xl italic leading-none text-[#FDFBF7] sm:text-8xl">Cynthia</h1>
+              <p className="mx-auto max-w-xs text-[11px] font-mono uppercase tracking-[0.24em] text-[#A68A56] opacity-80 sm:max-w-none sm:text-[12px] sm:tracking-[0.4em] md:mx-0">
                 The Arrangement & The Executive Suite
               </p>
             </div>
@@ -267,7 +343,7 @@ export default function App() {
 
             <button 
               onClick={handleLogin}
-              className="group relative flex items-center space-x-4 bg-transparent border border-[#A68A56]/50 px-10 py-5 rounded-sm hover:border-[#FDFBF7] transition-all duration-500 overflow-hidden"
+              className="group relative flex items-center space-x-4 overflow-hidden rounded-sm border border-[#A68A56]/50 bg-transparent px-8 py-4 transition-all duration-500 hover:border-[#FDFBF7] sm:px-10 sm:py-5"
             >
               <div className="absolute inset-0 bg-[#A68A56] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
               <LogIn size={20} className="relative z-10 text-[#FDFBF7] group-hover:text-[#1B3022] transition-colors" />
@@ -279,7 +355,7 @@ export default function App() {
           </motion.div>
         </div>
 
-        <div className="absolute bottom-10 flex flex-col items-center space-y-2">
+        <div className="absolute bottom-[calc(env(safe-area-inset-bottom)+1.5rem)] flex flex-col items-center space-y-2">
           <span className="text-[10px] font-mono text-[#A68A56]/40 uppercase tracking-[0.2em]">1960 Private Edition</span>
           <div className="flex space-x-4 opacity-20">
             <div className="w-1.5 h-1.5 rounded-full bg-[#A68A56]" />
@@ -292,14 +368,14 @@ export default function App() {
   }
 
   return (
-    <div id="app-root" className="flex h-screen bg-[#FDFBF7] text-[#111827] selection:bg-[#A68A56]/30 overflow-hidden">
+    <div id="app-root" className="flex h-dvh min-h-dvh overflow-hidden bg-[#FDFBF7] text-[#111827] selection:bg-[#A68A56]/30 md:flex-row">
       <AnimatePresence>
         {updateAvailable && (
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-4 right-4 z-[100] bg-[#1B3022] text-[#FDFBF7] px-6 py-3 rounded-sm border border-[#A68A56]/50 shadow-2xl flex items-center space-x-4"
+            className="fixed inset-x-4 top-[calc(env(safe-area-inset-top)+1rem)] z-[100] flex flex-col gap-3 rounded-sm border border-[#A68A56]/50 bg-[#1B3022] px-5 py-4 text-[#FDFBF7] shadow-2xl sm:left-auto sm:right-4 sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-3"
           >
             <span className="font-serif italic text-sm">A fresh memo just landed, Sugar. Time for an upgrade.</span>
             <a 
@@ -316,66 +392,75 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
-      <Sidebar 
-        conversations={conversations} 
-        selectedId={selectedConvId}
-        onSelect={setSelectedConvId}
-        onNewFrequency={() => setShowNewModal(true)}
-        filter={filter}
-        setFilter={setFilter}
-        onLogout={handleLogout}
-      />
-      <ChatView 
-        conversation={conversations.find(c => c.id === selectedConvId)}
-        messages={messages}
-        onSendMessage={handleSendMessage}
-      />
+      <div className={`${selectedConvId ? 'hidden md:flex' : 'flex'} h-full w-full md:w-80 md:shrink-0`}>
+        <Sidebar 
+          conversations={conversations} 
+          selectedId={selectedConvId}
+          onSelect={setSelectedConvId}
+          onNewFrequency={() => setShowNewModal(true)}
+          filter={filter}
+          setFilter={setFilter}
+          onLogout={handleLogout}
+        />
+      </div>
+      <div className={`${selectedConvId ? 'flex' : 'hidden md:flex'} h-full min-w-0 flex-1`}>
+        <ChatView 
+          conversation={selectedConversation}
+          messages={messages}
+          isAssistantTyping={isAssistantTyping}
+          onBack={() => setSelectedConvId(undefined)}
+          onSendMessage={handleSendMessage}
+        />
+      </div>
 
       <AnimatePresence>
         {showNewModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-3 backdrop-blur-sm sm:items-center sm:p-4">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-[#FDFBF7] border border-[#A68A56]/30 rounded-lg overflow-hidden shadow-2xl"
+              className="max-h-[min(90dvh,42rem)] w-full max-w-md overflow-y-auto rounded-lg border border-[#A68A56]/30 bg-[#FDFBF7] shadow-2xl"
             >
-              <div className="p-8 border-b border-[#A68A56]/10 flex justify-between items-center bg-white/40">
+              <div className="flex items-center justify-between border-b border-[#A68A56]/10 bg-white/40 p-5 sm:p-8">
                 <h3 className="text-xl font-serif italic text-[#1B3022]">Top Secret Filing</h3>
                 <button onClick={() => setShowNewModal(false)} className="text-[#A68A56] hover:text-[#991B1B] transition-colors p-1">
                   <Plus size={24} className="rotate-45" />
                 </button>
               </div>
-              <form onSubmit={handleCreateFrequency} className="p-8 space-y-6">
+              <form onSubmit={handleCreateFrequency} className="space-y-6 p-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] sm:p-8">
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-mono text-[#A68A56] uppercase tracking-[0.2em]">Who's Calling, Executive?</label>
                   <input 
                     autoFocus
                     required
                     type="text" 
+                    autoComplete="name"
                     value={newContact.name}
                     onChange={e => setNewContact({...newContact, name: e.target.value})}
                     placeholder="The Face"
-                    className="w-full bg-white border border-[#E5E7EB] rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#A68A56] focus:border-[#A68A56] transition-all"
+                    className="w-full rounded-sm border border-[#E5E7EB] bg-white px-4 py-3 text-base transition-all focus:border-[#A68A56] focus:outline-none focus:ring-1 focus:ring-[#A68A56] sm:text-sm"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-mono text-[#A68A56] uppercase tracking-[0.2em]">The Frequency</label>
                   <input 
                     required
-                    type="text" 
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
                     value={newContact.phone}
                     onChange={e => setNewContact({...newContact, phone: e.target.value})}
                     placeholder="+1 (000) 000-0000"
-                    className="w-full bg-white border border-[#E5E7EB] rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#A68A56] focus:border-[#A68A56] transition-all"
+                    className="w-full rounded-sm border border-[#E5E7EB] bg-white px-4 py-3 text-base transition-all focus:border-[#A68A56] focus:outline-none focus:ring-1 focus:ring-[#A68A56] sm:text-sm"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-mono text-[#A68A56] uppercase tracking-[0.2em]">The Nature of the Signal</label>
                   <select 
                     value={newContact.category}
-                    onChange={e => setNewContact({...newContact, category: e.target.value as any})}
-                    className="w-full bg-white border border-[#E5E7EB] rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#A68A56] appearance-none cursor-pointer"
+                    onChange={e => setNewContact({...newContact, category: e.target.value as Conversation['category']})}
+                    className="w-full cursor-pointer appearance-none rounded-sm border border-[#E5E7EB] bg-white px-4 py-3 text-base focus:outline-none focus:ring-1 focus:ring-[#A68A56] sm:text-sm"
                   >
                     <option value="business">Ambition (Keep it dry)</option>
                     <option value="personal">Complications (Strictly Private)</option>
@@ -385,7 +470,7 @@ export default function App() {
                 </div>
                 <button 
                   type="submit"
-                  className="w-full mt-6 bg-[#1B3022] text-[#FDFBF7] py-4 rounded-sm text-[11px] font-mono uppercase tracking-[0.3em] hover:bg-[#142319] transition-all active:scale-[0.98] shadow-lg"
+                  className="mt-6 w-full rounded-sm bg-[#1B3022] py-4 text-[11px] font-mono uppercase tracking-[0.24em] text-[#FDFBF7] shadow-lg transition-all hover:bg-[#142319] active:scale-[0.98] sm:tracking-[0.3em]"
                 >
                   Tuck it into the Drawer
                 </button>

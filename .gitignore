@@ -15,6 +15,12 @@ Thumbs.db
 !.env.example
 firebase-applet-config.json
 
+# Local model and corpus work
+local-corpus/
+*.jsonl
+*.safetensors
+*.gguf
+
 # IDEs
 .vscode/
 .idea/

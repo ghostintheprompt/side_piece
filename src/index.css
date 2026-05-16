@@ -19,6 +19,16 @@
   --walnut: #3D2B1F;
 }
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  background: var(--bg-app);
+}
+
 body {
   background-color: var(--bg-app);
   color: var(--ink);
@@ -30,6 +40,23 @@ body {
     linear-gradient(90deg, rgba(27, 48, 34, 0.01) 1px, transparent 1px);
   background-size: 24px 24px, 48px 48px, 48px 48px;
   overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
 }
 
 /* Custom scrollbar */
