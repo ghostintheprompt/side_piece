@@ -17,6 +17,7 @@ firebase-applet-config.json
 
 # Local model and corpus work
 local-corpus/
+.local-calls/
 *.jsonl
 *.safetensors
 *.gguf

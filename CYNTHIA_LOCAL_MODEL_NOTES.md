@@ -6,6 +6,8 @@ Cynthia should not be a hosted-model wrapper. She is a portfolio piece, a voice 
 
 This will take time. That is the point. Each pass builds skill: corpus prep, OCR cleanup, style analysis, local inference, evaluation, and eventually a small adapter that carries Cynthia without sending the Arrangement outside the room.
 
+The larger reason is work. Every Side Piece milestone should show a concrete skill: taste, restraint, privacy, local AI, voice design, telephony, and the ability to bridge messy real-world systems into something people can actually use.
+
 ## Working Principle
 
 Train the voice, not the facts.

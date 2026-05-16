@@ -9,6 +9,8 @@
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
+    "voice:simulate": "node scripts/simulate-cynthia-call.mjs",
+    "voice:inbox": "node scripts/read-cynthia-calls.mjs",
     "ollama:pull": "ollama pull llama3.2:3b",
     "ollama:create": "ollama create cynthia -f ollama/Modelfile",
     "ollama:setup": "npm run ollama:pull && npm run ollama:create",
